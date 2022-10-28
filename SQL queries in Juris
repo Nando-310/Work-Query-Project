@@ -5,9 +5,22 @@ FROM Client INNER JOIN Employee ON Client.CliBillingAtty = Employee.EmpSysNbr
 WHERE (Employee.EmpID = 'XXX')
 
 
-Find all matters with a specific billing format to apply new format in Ascending Order.
+#Find all matters with a specific billing format to apply new format in Ascending Order.
+## We switched over to a new billing format a wanted to make sure all of our bills were in sync.
 
 SELECT Client.CliCode AS Client, Matter.MatCode AS Matter, BillTo.BillToEditFormat AS [Prebill Format], BillTo.BillToBillFormat AS [Bill Format] 
 FROM Client INNER JOIN (Matter INNER JOIN BillTo ON Matter.MatBillTo = BillTo.BillToSysNbr) ON Client.CliSysNbr = Matter.MatCliNbr 
 WHERE BillTo.billtobillformat NOT LIKE '%ev30' AND BillTo.billtoeditformat NOT LIKE '%pre30' AND Client.CliCode >= 10000 
 ORDER BY Client.CliCode ASC
+
+# Find all posted bills and who posted within a specific date
+
+SELECT ARPostBatch.ARPDatePosted AS [Date Posted], Employee.EmpInitials AS [Emp. Initials], Employee.EmpName AS [Emp. Name], ARPostDetail_Log.HostMachine AS Workstation, ARPostDetail_Log.ARPDBillNbr AS [Bill #],
+Client.CliCode AS [Client Code], Client.CliNickName AS [Client Name], Matter.MatCode AS [Matter Code], Matter.MatNickName AS [Matter Name]
+FROM ARPostDetail_Log
+INNER JOIN Employee ON ARPostDetail_Log.JurisUser = Employee.EmpSysNbr
+INNER JOIN ARMatAlloc ON ARPostDetail_Log.ARPDBillNbr = ARMatAlloc.ARMBillNbr
+INNER JOIN Matter ON Matter.MatSysNbr = ARMatAlloc.ARMMatter
+INNER JOIN Client ON Client.CliSysNbr = Matter.MatCliNbr
+INNER JOIN ARPostBatch ON ARPostBatch.ARPBatchNbr = ARPostDetail_Log.ARPDBatch AND ARPostBatch.ARPPostedBy = ARPostDetail_Log.JurisUser
+WHERE ARPostBatch.ARPDatePosted >= 'mm/dd/yyyy' AND ARPostBatch.ARPDatePosted <= 'MM/DD/YYYY'
