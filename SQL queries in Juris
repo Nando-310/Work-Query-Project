@@ -1,0 +1,13 @@
+# Run a query to find clients assigned to a specific Attorney
+
+SELECT Client.CliCode AS 'Client Code', Client.CliNickName AS 'Client Name', Employee.EmpID AS 'Employee ID', Employee.EmpName AS 'Billing Atty' 
+FROM Client INNER JOIN Employee ON Client.CliBillingAtty = Employee.EmpSysNbr 
+WHERE (Employee.EmpID = 'XXX')
+
+
+Find all matters with a specific billing format to apply new format in Ascending Order.
+
+SELECT Client.CliCode AS Client, Matter.MatCode AS Matter, BillTo.BillToEditFormat AS [Prebill Format], BillTo.BillToBillFormat AS [Bill Format] 
+FROM Client INNER JOIN (Matter INNER JOIN BillTo ON Matter.MatBillTo = BillTo.BillToSysNbr) ON Client.CliSysNbr = Matter.MatCliNbr 
+WHERE BillTo.billtobillformat NOT LIKE '%ev30' AND BillTo.billtoeditformat NOT LIKE '%pre30' AND Client.CliCode >= 10000 
+ORDER BY Client.CliCode ASC
