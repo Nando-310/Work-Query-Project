@@ -24,3 +24,12 @@ INNER JOIN Matter ON Matter.MatSysNbr = ARMatAlloc.ARMMatter
 INNER JOIN Client ON Client.CliSysNbr = Matter.MatCliNbr
 INNER JOIN ARPostBatch ON ARPostBatch.ARPBatchNbr = ARPostDetail_Log.ARPDBatch AND ARPostBatch.ARPPostedBy = ARPostDetail_Log.JurisUser
 WHERE ARPostBatch.ARPDatePosted >= 'mm/dd/yyyy' AND ARPostBatch.ARPDatePosted <= 'MM/DD/YYYY'
+
+# Find a bill by its Bill Number and see which attorney's billed and how much time was billed to the client
+## I Modified this Query to only give us the client information utilizing the bill number. We kept receiving checks that refered to a bill number and no client information so it would make it difficult to find the right account to apply the funds.
+
+SELECT BilledTime.BTBillNbr AS [Bill Nbr], Client.CliCode AS Client, Matter.MatCode AS Matter 
+FROM BilledTime
+INNER JOIN Matter ON Matter.MatSysNbr = BilledTime.BTMatter 
+INNER JOIN Client ON Client.CliSysNbr = Matter.MatCliNbr 
+WHERE BilledTime.BTBillNbr LIKE '%######'
